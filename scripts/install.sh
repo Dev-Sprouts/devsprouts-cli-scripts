@@ -139,8 +139,7 @@ setup_autocomplete() {
     echo "Added autocomplete setup to $rc_file"
   fi
 
-  # shellcheck disable=SC1090
-  source "$rc_file" || true
+  echo "Reload your shell to activate autocomplete: source $rc_file"
 }
 
 run_config_init() {
