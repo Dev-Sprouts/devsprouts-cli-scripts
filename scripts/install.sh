@@ -204,7 +204,11 @@ trap cleanup EXIT
 ensure_setup_script
 
 echo "Step 1/4: configuring private npm registry and installing devsprouts-cli..."
-"$SETUP_SCRIPT" "${SETUP_ARGS[@]}" --install
+if ((${#SETUP_ARGS[@]})); then
+  "$SETUP_SCRIPT" "${SETUP_ARGS[@]}" --install
+else
+  "$SETUP_SCRIPT" --install
+fi
 
 DEVSPROUTS_BIN="$(resolve_devsprouts_bin)"
 SELECTED_SHELL="$(detect_shell)"
