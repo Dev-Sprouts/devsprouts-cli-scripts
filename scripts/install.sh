@@ -14,6 +14,9 @@ REF_NAME="$DEFAULT_REF"
 SETUP_SCRIPT_URL=""
 SETUP_ARGS=()
 TMP_SETUP_SCRIPT=""
+AUTOCOMPLETE_BEGIN_MARKER="# >>> devsprouts autocomplete >>>"
+AUTOCOMPLETE_END_MARKER="# <<< devsprouts autocomplete <<<"
+LEGACY_AUTOCOMPLETE_MARKER="# devsprouts autocomplete setup"
 
 print_help() {
   cat <<'USAGE'
@@ -107,6 +110,7 @@ setup_autocomplete() {
   local devsprouts_bin="$1"
   local shell_name="$2"
   local rc_file=""
+  local had_existing="false"
 
   case "$shell_name" in
     zsh)
@@ -132,10 +136,26 @@ setup_autocomplete() {
   fi
 
   touch "$rc_file"
-  if grep -Fq "# devsprouts autocomplete setup" "$rc_file"; then
-    echo "Autocomplete already configured in $rc_file"
+  if grep -Fq "$AUTOCOMPLETE_BEGIN_MARKER" "$rc_file" || grep -Fq "$LEGACY_AUTOCOMPLETE_MARKER" "$rc_file"; then
+    had_existing="true"
+  fi
+
+  local tmp_rc
+  tmp_rc="$(mktemp -t devsprouts-rc-clean.XXXXXX)"
+  awk -v begin="$AUTOCOMPLETE_BEGIN_MARKER" -v end="$AUTOCOMPLETE_END_MARKER" -v legacy="$LEGACY_AUTOCOMPLETE_MARKER" '
+    BEGIN { in_block=0 }
+    index($0, begin) { in_block=1; next }
+    index($0, end) { in_block=0; next }
+    in_block { next }
+    index($0, legacy) { next }
+    { print }
+  ' "$rc_file" > "$tmp_rc"
+  mv "$tmp_rc" "$rc_file"
+
+  printf "\n%s\n%s\n%s\n" "$AUTOCOMPLETE_BEGIN_MARKER" "$snippet" "$AUTOCOMPLETE_END_MARKER" >> "$rc_file"
+  if [[ "$had_existing" == "true" ]]; then
+    echo "Updated autocomplete setup in $rc_file"
   else
-    printf "\n%s\n" "$snippet" >> "$rc_file"
     echo "Added autocomplete setup to $rc_file"
   fi
 

@@ -8,6 +8,18 @@ Public installer scripts for `@dev-sprouts/devsprouts-cli`.
 curl -fsSL https://raw.githubusercontent.com/Dev-Sprouts/devsprouts-cli-scripts/main/scripts/install.sh | bash
 ```
 
+## One-step uninstall
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Dev-Sprouts/devsprouts-cli-scripts/main/scripts/uninstall.sh | bash
+```
+
+Optional cleanup:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Dev-Sprouts/devsprouts-cli-scripts/main/scripts/uninstall.sh | bash -s -- --remove-registry --purge-config --yes
+```
+
 ## What it does
 
 1. Configures npm to use GitHub Packages with your `gh auth token`
@@ -21,4 +33,3 @@ curl -fsSL https://raw.githubusercontent.com/Dev-Sprouts/devsprouts-cli-scripts/
 - `gh` authenticated (`gh auth login`)
 - `npm`
 - `curl`
-
